@@ -1,6 +1,9 @@
+import logging
 import time
 
 from six import get_method_function, get_method_self, wraps
+
+FALLBACK_LOGGER = logging.getLogger(__name__).getChild("fallback")
 
 
 def call_sig(args, kwargs):
@@ -18,7 +21,7 @@ def call_sig(args, kwargs):
     return "({args})".format(args=", ".join(arglist))
 
 
-def logged(log_args=False, log_result=False):
+def logged(_missused=False, log_args=False, log_result=False):
     """Decorator that logs entry and exit to a method and also times the execution.
 
     It assumes that the object where you decorate the methods on
@@ -34,26 +37,27 @@ def logged(log_args=False, log_result=False):
         def wrapped(self, *args, **kwargs):
             start_time = time.time()
             signature = f.__name__ + (call_sig(args, kwargs) if log_args else "")
-            self.logger.debug("%s started", signature)
+            log = getattr(self, "logger", FALLBACK_LOGGER)
+            log.debug("%s started", signature)
             try:
                 result = f(self, *args, **kwargs)
             except Exception as e:
                 elapsed_time = (time.time() - start_time) * 1000.0
-                self.logger.error(
+                log.error(
                     "An exception happened during %s call (elapsed %.0f ms)",
                     signature,
                     elapsed_time,
                 )
-                self.logger.exception(e)
+                log.exception(e)
                 raise
             else:
                 elapsed_time = (time.time() - start_time) * 1000.0
                 if log_result:
-                    self.logger.info(
+                    log.info(
                         "%s -> %r (elapsed %.0f ms)", signature, result, elapsed_time
                     )
                 else:
-                    self.logger.info("%s (elapsed %.0f ms)", signature, elapsed_time)
+                    log.info("%s (elapsed %.0f ms)", signature, elapsed_time)
                 return result
 
         wrapped.original_function = f

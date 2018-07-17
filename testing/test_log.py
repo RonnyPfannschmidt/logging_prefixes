@@ -1,32 +1,40 @@
 # -*- coding: utf-8 -*-
+import logging
 
 import pytest
 from logging_prefixes import call_sig, call_unlogged, logged
 
 
-def test_logged_method_unlogged():
-    class MyClass(object):
-        @logged()
-        def method(self):
-            return True
+class MyClass(object):
+    @logged()
+    def logged_method(self):
+        return True
 
-    class AnotherClass(MyClass):
-        def method(self):
-            return call_unlogged(super(AnotherClass, self).method)
+    def unlogged_method(self):
+        return True
 
-    assert AnotherClass().method()
+
+class MyUnloggedClass(MyClass):
+    def logged_method(self):
+        return call_unlogged(super(MyUnloggedClass, self).logged_method)
+
+    def unlogged_method(self):
+        return call_unlogged(super(MyUnloggedClass, self).unlogged_method)
+
+
+def test_logged_method_unlogged(caplog):
+    assert MyUnloggedClass().logged_method()
+    assert not caplog.records
 
 
 def test_normal_method_unlogged():
-    class MyClass(object):
-        def method(self):
-            return True
+    assert MyUnloggedClass().unlogged_method()
 
-    class AnotherClass(MyClass):
-        def method(self):
-            return call_unlogged(super(AnotherClass, self).method)
 
-    assert AnotherClass().method()
+def test_normal_method_logged(caplog):
+    caplog.set_level(logging.DEBUG, logger="logging_prefixes")
+    assert MyClass().logged_method()
+    assert caplog.records
 
 
 @pytest.mark.parametrize(
