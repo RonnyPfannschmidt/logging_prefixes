@@ -2,6 +2,7 @@
 import logging
 
 import pytest
+
 from logging_prefixes import call_sig, call_unlogged, logged
 
 
