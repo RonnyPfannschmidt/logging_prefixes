@@ -3,7 +3,7 @@ import logging
 import attr
 
 
-@attr.ib
+@attr.s
 class PrependAdapter(logging.LoggerAdapter):
     """This class ensures the path to the widget is represented in the log records."""
 
