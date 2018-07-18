@@ -21,16 +21,17 @@ class PrependAdapter(logging.LoggerAdapter):
         )
 
     @classmethod
-    def from_parent(cls, parent, suffix_for_prefix, joinby="/"):
+    def from_parent(cls, parent, suffix_for_prefix, join_with="/"):
         if isinstance(parent, cls):
             return type(parent)(
-                logger=parent.logger, prefix=parent.prefix + joinby + suffix_for_prefix
+                logger=parent.logger,
+                prefix=parent.prefix + join_with + suffix_for_prefix,
             )
         else:
             return cls(logger=parent, prefix=suffix_for_prefix)
 
-    def child_logger(self, child_name):
+    def for_child(self, child_name):
         return self.from_parent(self, child_name)
 
-    def item_logger(self, item):
-        return self.from_parent(self, "[{!r}]".format(item), joinby="")
+    def for_item(self, item):
+        return self.from_parent(self, "[{!r}]".format(item), join_with="")

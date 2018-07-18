@@ -4,12 +4,12 @@ from __future__ import unicode_literals
 
 from .funcwrap import logged, call_unlogged, call_sig
 from .adapter import PrependAdapter
-from .coerce import coerce_from_parent_to_prepend_logger
+from .coerce import context_to_path_logger
 
 __all__ = [
     "logged",
     "call_unlogged",
     "call_sig",
     "PrependAdapter",
-    "coerce_from_parent_to_prepend_logger",
+    "context_to_path_logger",
 ]
