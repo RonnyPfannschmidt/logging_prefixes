@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import logging
 
 import pytest
@@ -6,7 +5,7 @@ import pytest
 from logging_prefixes import call_sig, call_unlogged, logged
 
 
-class MyClass(object):
+class MyClass:
     @logged()
     def logged_method(self):
         return True
@@ -17,10 +16,10 @@ class MyClass(object):
 
 class MyUnloggedClass(MyClass):
     def logged_method(self):
-        return call_unlogged(super(MyUnloggedClass, self).logged_method)
+        return call_unlogged(super().logged_method)
 
     def unlogged_method(self):
-        return call_unlogged(super(MyUnloggedClass, self).unlogged_method)
+        return call_unlogged(super().unlogged_method)
 
 
 def test_logged_method_unlogged(caplog):
