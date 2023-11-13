@@ -1,7 +1,8 @@
 import logging
 import time
 
-from six import get_method_function, get_method_self, wraps
+from six import get_method_function, get_method_self
+from functools import wraps
 
 FALLBACK_LOGGER = logging.getLogger(__name__).getChild("fallback")
 
@@ -83,6 +84,6 @@ def call_unlogged(method, *args, **kwargs):
     try:
         f = method.original_function
     except AttributeError:
-        f = get_method_function(method)
+        f = method.__func__
 
-    return f(get_method_self(method), *args, **kwargs)
+    return f(method.__self__, *args, **kwargs)
